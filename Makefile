@@ -14,6 +14,7 @@ clean:
 
 setup:
 	mkdir -p src/$(PROJECT)
+	rmdir src/$(PROJECT)
 	ln -s ../../.. src/$(PROJECT)
 	$(GOCMD) get gopkg.in/mgo.v2
 	$(GOCMD) get gopkg.in/check.v1
