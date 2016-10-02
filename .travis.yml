@@ -6,5 +6,8 @@ go:
   - 1.7
   - tip
 
+services:
+  - mongodb
+
 script:
  - make setup && make test
