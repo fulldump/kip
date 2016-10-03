@@ -1,6 +1,11 @@
 #Kip
 
-[![Build Status](https://travis-ci.org/fulldump/kip.svg?branch=master)](https://travis-ci.org/fulldump/kip)
+<p align="center">
+<a href="https://travis-ci.org/fulldump/kip"><img src="https://travis-ci.org/fulldump/kip.svg?branch=master"></a>
+<a href="https://goreportcard.com/report/fulldump/kip"><img src="http://goreportcard.com/badge/fulldump/kip"></a>
+<a href="https://godoc.org/github.com/fulldump/kip"><img src="https://godoc.org/github.com/fulldump/kip?status.svg" alt="GoDoc"></a>
+</p>
+
 
 Kip is a Object wrapper for MongoDB.
 
