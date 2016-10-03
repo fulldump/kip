@@ -1,3 +1,7 @@
+#Kip
+
+[![Build Status](https://travis-ci.org/fulldump/kip.svg?branch=master)](https://travis-ci.org/fulldump/kip)
+
 Kip is a Object wrapper for MongoDB.
 
 # How to use
