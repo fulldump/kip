@@ -1,4 +1,4 @@
-#Kip
+<img src="logo.png">
 
 <p align="center">
 <a href="https://travis-ci.org/fulldump/kip"><img src="https://travis-ci.org/fulldump/kip.svg?branch=master"></a>
@@ -8,6 +8,23 @@
 
 
 Kip is a Object wrapper for MongoDB.
+
+
+<!-- MarkdownTOC autolink=true bracket=round depth=4 -->
+
+- [How to use](#how-to-use)
+	- [Define](#define)
+	- [Create DAO](#create-dao)
+	- [CRUD: Create](#crud-create)
+	- [CRUD: Retrieve](#crud-retrieve)
+		- [FindOne](#findone)
+		- [FindById](#findbyid)
+		- [Find](#find)
+	- [CRUD: Update](#crud-update)
+	- [CRUD: Delete](#crud-delete)
+
+<!-- /MarkdownTOC -->
+
 
 # How to use
 
