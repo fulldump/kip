@@ -34,7 +34,7 @@ func (i *Instance) FindById(id interface{}) *Item {
  * Returned values:
  *  - *Item   -> All works
  *  - nil     -> Item not found
- *  - panic() -> Some kind of uncontrolled error hapened
+ *  - panic() -> Some kind of uncontrolled error happened
  */
 func (i *Instance) FindOne(query bson.M) *Item {
 	item := i.Create()
