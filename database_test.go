@@ -14,7 +14,7 @@ var (
 )
 
 func openTestDatabase() (*Database, error) {
-	return NewDatabase(DATABASE_HOST, DATABASE_NAME)
+	return NewDatabase("mongodb://" + DATABASE_HOST + "/" + DATABASE_NAME)
 }
 
 func closeTestDatabase() {
@@ -31,8 +31,8 @@ func TestDatabase_Configure_TwoDBs_OneHost(t *testing.T) {
 	name1 := random_name("db1")
 	name2 := random_name("db2")
 
-	db1, _ := NewDatabase(host, name1)
-	db2, _ := NewDatabase(host, name2)
+	db1, _ := NewDatabase(host + "/" + name1)
+	db2, _ := NewDatabase(host + "/" + name2)
 
 	if db1.session != db2.session {
 		t.Error("Two dbs with the same host should have the same session")
@@ -45,8 +45,8 @@ func TestDatabase_Configure_TwoDBs_TwoHosts(t *testing.T) {
 	name1 := random_name("db1")
 	name2 := random_name("db2")
 
-	db1, _ := NewDatabase(host1, name1)
-	db2, _ := NewDatabase(host2, name2)
+	db1, _ := NewDatabase(host1 + "/" + name1)
+	db2, _ := NewDatabase(host2 + "/" + name2)
 
 	if db1.session == db2.session {
 		t.Error("Two dbs with the different hosts should have different sessions")

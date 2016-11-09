@@ -9,36 +9,41 @@ import (
 )
 
 type Database struct {
-	hosts    string
-	database string
-	session  *mgo.Session
+	addrs   string
+	name    string // TODO: rename to `name`
+	session *mgo.Session
 }
 
 var MONGO_DIAL_TIMEOUT = 0 * time.Second
 var MONGO_SYNC_TIMEOUT = 3 * time.Second
 var MONGO_SOCKET_TIMEOUT = 3 * time.Second
 
-var sessions_by_hosts = map[string]*mgo.Session{}
+var sessions_by_addrs = map[string]*mgo.Session{}
 
-func NewDatabase(hosts, database string) (*Database, error) {
+func NewDatabase(mongourl string) (*Database, error) {
 
-	hosts = normalize_hosts(hosts)
+	url, url_err := mgo.ParseURL(mongourl)
+	if nil != url_err {
+		panic(url_err)
+	}
+
+	addrs := normalize_addrs(url.Addrs)
 
 	// Initialize Database
 	db := &Database{
-		hosts:    hosts,
-		database: database,
-		session:  nil,
+		addrs:   addrs,
+		name:    url.Database,
+		session: nil,
 	}
 
 	// Check if a session already exists
-	if previous_session, exists := sessions_by_hosts[hosts]; exists {
+	if previous_session, exists := sessions_by_addrs[addrs]; exists {
 		db.session = previous_session
 		return db, nil
 	}
 
 	// Create new session
-	session, err := mgo.DialWithTimeout(hosts, MONGO_DIAL_TIMEOUT)
+	session, err := mgo.DialWithTimeout(mongourl, MONGO_DIAL_TIMEOUT)
 	if nil != err {
 		return nil, err
 	}
@@ -50,43 +55,37 @@ func NewDatabase(hosts, database string) (*Database, error) {
 	session.SetSyncTimeout(MONGO_SYNC_TIMEOUT)
 	session.SetSocketTimeout(MONGO_SOCKET_TIMEOUT)
 
-	sessions_by_hosts[hosts] = session
+	sessions_by_addrs[addrs] = session
 
 	db.session = session
 
 	return db, nil
 }
 
-func Close(hosts string) {
-	if session, exists := sessions_by_hosts[hosts]; exists {
+func Close(addrs string) {
+	if session, exists := sessions_by_addrs[addrs]; exists {
 		session.Close()
 	}
 }
 
 func CloseAll() {
-	for i, session := range sessions_by_hosts {
-		delete(sessions_by_hosts, i)
+	for i, session := range sessions_by_addrs {
+		delete(sessions_by_addrs, i)
 		session.Close()
 	}
 }
 
 func (this *Database) C(collection string) *mgo.Collection {
-	return this.session.DB(this.database).C(collection)
+	return this.session.DB(this.name).C(collection)
 }
 
-func normalize_hosts(hosts string) string {
+func (this *Database) GetName() string {
+	return this.name
+}
 
-	separator := ","
+func normalize_addrs(addrs []string) string {
 
-	parts := strings.Split(hosts, separator)
+	sort.Strings(addrs)
 
-	for k, v := range parts {
-		parts[k] = strings.Trim(v, " ")
-	}
-
-	hosts = strings.Join(parts, separator)
-
-	sort.Strings(parts)
-
-	return hosts
+	return strings.Join(addrs, ",")
 }

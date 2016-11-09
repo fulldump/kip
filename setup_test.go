@@ -25,7 +25,7 @@ var _ = Suite(&World{
 
 func (w *World) SetUpSuite(c *C) {
 
-	db, err := NewDatabase(w.MongoHosts, random_name("kip"))
+	db, err := NewDatabase(w.MongoHosts + "/" + random_name("kip"))
 	if err != nil {
 		panic("Fail creating a TESTING database. Please, check your MongoDB")
 	}
@@ -53,6 +53,6 @@ func (w *World) TearDownTest(c *C) {
 	// When all tests are finished, drop database
 	session, _ := mgo.Dial(w.MongoHosts)
 	session.SetMode(mgo.Monotonic, true)
-	session.DB(w.Database.database).DropDatabase()
+	session.DB(w.Database.name).DropDatabase()
 	session.Close()
 }
