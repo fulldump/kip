@@ -48,3 +48,27 @@ func (w *World) Test_InstanceFindOne_Fail(c *C) {
 	// Check
 	c.Assert(u, IsNil)
 }
+
+func (w *World) Test_Dao_Delete_Ok(c *C) {
+
+	u1 := w.Users.Create()
+	u1.Value.(*User).Name = "a"
+	u1.Save()
+
+	u2 := w.Users.Create()
+	u2.Value.(*User).Name = "b"
+	u2.Save()
+
+	u3 := w.Users.Create()
+	u3.Value.(*User).Name = "a"
+	u3.Save()
+
+	n, err := w.Users.Delete(bson.M{"name": "a"})
+
+	c.Assert(n, Equals, 2)
+	c.Assert(err, IsNil)
+
+	objects, _ := w.Users.Find(bson.M{"name": "a"}).Count()
+	c.Assert(objects, Equals, 0)
+
+}

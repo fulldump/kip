@@ -70,3 +70,14 @@ func (i *Dao) Find(query bson.M) *Query {
 		mgo_query: i.Database.C(collection).Find(query),
 	}
 }
+
+// Delete will remove all items that match with the query
+func (i *Dao) Delete(query bson.M) (n int, err error) {
+
+	name := i.Collection.Name
+	c := i.Database.C(name)
+
+	info, err := c.RemoveAll(query)
+
+	return info.Removed, err
+}
