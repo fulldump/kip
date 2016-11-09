@@ -27,7 +27,7 @@ func (k *Kip) Define(c *Collection) {
 	k.collections[name] = c
 }
 
-func (k *Kip) Create(name string, db *Database) *Instance {
+func (k *Kip) NewDao(name string, db *Database) *Instance {
 
 	// Check name is defined
 	c, exists := k.collections[name]

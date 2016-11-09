@@ -9,7 +9,7 @@ func (w *World) Test_InstanceFindById_Ok(c *C) {
 
 	// Prepare
 	john := w.Users.Create()
-	john.Save()
+	w.Users.Insert(john)
 
 	// Run
 	u := w.Users.FindById(john.GetId())
@@ -31,7 +31,7 @@ func (w *World) Test_InstanceFindOne_Ok(c *C) {
 	// Prepare
 	john := w.Users.Create()
 	john.Value.(*User).Name = "John Snow"
-	john.Save()
+	w.Users.Insert(john)
 
 	// Run
 	u := w.Users.FindOne(bson.M{"name": "John Snow"})

@@ -23,6 +23,16 @@ func (i *Instance) Create() *Item {
 	}
 }
 
+func (i *Instance) Insert(o *Item) error {
+	// TODO: Check if already inserted?
+
+	err := i.Database.C(i.Collection.Name).Insert(o.Value)
+
+	// TODO: Update inserted field?
+
+	return err
+}
+
 /**
  * FindById is a particular case of FindOne
  */

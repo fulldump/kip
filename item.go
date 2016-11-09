@@ -13,10 +13,7 @@ type Item struct { // or interface{} ?????
 }
 
 func (i *Item) Save() error {
-	instance := i.Instance
-	collection := instance.Collection
-
-	return instance.Database.C(collection.Name).Insert(i.Value)
+	return i.Instance.Insert(i)
 }
 
 func (i *Item) GetId() interface{} {
@@ -41,7 +38,7 @@ func get_id(item interface{}) interface{} {
 				return t.Field(i).Interface()
 			}
 		}
-		// Fallback: search for fieldnames 'id' or 'Id'
+		// Fallback: search CI for fieldnames 'id'
 		for i := 0; i < n; i++ {
 			field := t.Type().Field(i)
 			if "id" == strings.ToLower(field.Name) {

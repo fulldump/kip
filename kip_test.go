@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func (w *World) Test_HappyPath(c *C) {
+func (w *World) Test_DaoHappyPath(c *C) {
 
 	john := w.Users.Create()
 
@@ -17,7 +17,7 @@ func (w *World) Test_HappyPath(c *C) {
 	value.Age = 16
 	value.Single = true
 
-	john.Save()
+	w.Users.Insert(john)
 
 	// Check
 	item := &User{}
@@ -28,7 +28,15 @@ func (w *World) Test_HappyPath(c *C) {
 	c.Assert(value, DeepEquals, item)
 }
 
-func (w *World) Test_CallbackOnCreate(c *C) {
+func (w *World) Test_DaoInsertTwice(c *C) {
+
+	john := w.Users.Create()
+
+	c.Assert(w.Users.Insert(john), IsNil)
+	c.Assert(w.Users.Insert(john), NotNil)
+}
+
+func (w *World) Test_DaoCallbackOnCreate(c *C) {
 
 	// Define collection
 	w.Kip.Define(&Collection{
@@ -42,7 +50,7 @@ func (w *World) Test_CallbackOnCreate(c *C) {
 	})
 
 	// Instantiate Dao
-	users := w.Kip.Create("Users2", nil)
+	users := w.Kip.NewDao("Users2", nil)
 
 	// Creae user
 	john := users.Create()
@@ -141,17 +149,14 @@ func (w *World) Test_DefinitionEnsureIndex(c *C) {
 		},
 	})
 
-	// TODO: Kip.Create() -> Change to NewDao()
-	// TODO: Save() should be in dao instead of item
-
-	users := w.Kip.Create("IndexedUsers", w.Database)
+	users := w.Kip.NewDao("IndexedUsers", w.Database)
 
 	user1 := users.Create()
-	err1 := user1.Save()
+	err1 := users.Insert(user1)
 	c.Assert(err1, IsNil)
 
 	user2 := users.Create()
-	err2 := user2.Save()
+	err2 := users.Insert(user2)
 	c.Assert(err2, NotNil)
 
 	result := []interface{}{}

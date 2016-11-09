@@ -46,7 +46,7 @@ func (w *World) SetUpTest(c *C) {
 		},
 	})
 
-	w.Users = w.Kip.Create("Users", w.Database)
+	w.Users = w.Kip.NewDao("Users", w.Database)
 }
 
 func (w *World) TearDownTest(c *C) {

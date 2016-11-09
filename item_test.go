@@ -21,4 +21,25 @@ func (w *World) Test_ItemDelete(c *C) {
 
 }
 
-// func (w *World) Test_Item
+func (w *World) Test_ItemSave(c *C) {
+
+	john := w.Users.Create()
+	john.Save()
+
+	// Check
+	item := &User{}
+	err := w.Database.C(w.Users.Collection.Name).Find(bson.M{
+		"_id": john.GetId(),
+	}).One(item)
+
+	c.Assert(err, IsNil)
+
+}
+
+func (w *World) Test_ItemSaveTwice(c *C) {
+
+	john := w.Users.Create()
+
+	c.Assert(john.Save(), IsNil)
+	c.Assert(john.Save(), NotNil)
+}

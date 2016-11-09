@@ -10,6 +10,6 @@ func Define(c *Collection) {
 	global.Define(c)
 }
 
-func Create(name string, db *Database) *Instance {
-	return global.Create(name, db)
+func NewDao(name string, db *Database) *Instance {
+	return global.NewDao(name, db)
 }
