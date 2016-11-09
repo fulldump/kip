@@ -16,7 +16,7 @@ type World struct {
 	MongoDatabase string
 	Database      *Database
 	Kip           *Kip
-	Users         *Instance
+	Users         *Dao
 }
 
 var _ = Suite(&World{

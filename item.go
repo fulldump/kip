@@ -8,12 +8,12 @@ import (
 )
 
 type Item struct { // or interface{} ?????
-	Instance *Instance
-	Value    interface{}
+	Dao   *Dao
+	Value interface{}
 }
 
 func (i *Item) Save() error {
-	return i.Instance.Insert(i)
+	return i.Dao.Insert(i)
 }
 
 func (i *Item) GetId() interface{} {
@@ -64,10 +64,10 @@ func word_in_string(w string, s string) bool {
 }
 
 func (i *Item) Delete() error { // Change name to `Remove` ???
-	instance := i.Instance
-	collection := instance.Collection
+	d := i.Dao
+	collection := d.Collection
 
-	return instance.Database.C(collection.Name).Remove(bson.M{
+	return d.Database.C(collection.Name).Remove(bson.M{
 		"_id": i.GetId(),
 	})
 }

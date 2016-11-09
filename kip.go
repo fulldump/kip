@@ -27,16 +27,16 @@ func (k *Kip) Define(c *Collection) {
 	k.collections[name] = c
 }
 
-func (k *Kip) NewDao(name string, db *Database) *Instance {
+func (k *Kip) NewDao(name string, db *Database) *Dao {
 
 	// Check name is defined
 	c, exists := k.collections[name]
 	if !exists {
-		panic("Try to instance `" + name + "` but it is not defined")
+		panic("Try to Dao `" + name + "` but it is not defined")
 	}
 
-	// Create instance
-	i := &Instance{
+	// Create Dao
+	i := &Dao{
 		Collection: c,
 		Database:   db,
 	}

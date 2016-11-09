@@ -2,7 +2,8 @@ package kip
 
 import "gopkg.in/mgo.v2/bson"
 
-type Instance struct {
+// Dao is the combination of `Collection` definition plus a `Database`
+type Dao struct {
 	Collection *Collection
 	Database   *Database
 }
@@ -10,7 +11,7 @@ type Instance struct {
 /**
  * Create a new item for the existing collection
  */
-func (i *Instance) Create() *Item {
+func (i *Dao) Create() *Item {
 
 	c := i.Collection.OnCreate
 	if nil == c {
@@ -18,12 +19,12 @@ func (i *Instance) Create() *Item {
 	}
 
 	return &Item{
-		Instance: i,
-		Value:    c(),
+		Dao:   i,
+		Value: c(),
 	}
 }
 
-func (i *Instance) Insert(o *Item) error {
+func (i *Dao) Insert(o *Item) error {
 	// TODO: Check if already inserted?
 
 	err := i.Database.C(i.Collection.Name).Insert(o.Value)
@@ -36,7 +37,7 @@ func (i *Instance) Insert(o *Item) error {
 /**
  * FindById is a particular case of FindOne
  */
-func (i *Instance) FindById(id interface{}) *Item {
+func (i *Dao) FindById(id interface{}) *Item {
 	return i.FindOne(bson.M{"_id": id})
 }
 
@@ -46,7 +47,7 @@ func (i *Instance) FindById(id interface{}) *Item {
  *  - nil     -> Item not found
  *  - panic() -> Some kind of uncontrolled error happened
  */
-func (i *Instance) FindOne(query bson.M) *Item {
+func (i *Dao) FindOne(query bson.M) *Item {
 	item := i.Create()
 
 	collection := i.Collection.Name
@@ -63,7 +64,7 @@ func (i *Instance) FindOne(query bson.M) *Item {
 	panic(err)
 }
 
-func (i *Instance) Find(query bson.M) *Query {
+func (i *Dao) Find(query bson.M) *Query {
 	collection := i.Collection.Name
 	return &Query{
 		mgo_query: i.Database.C(collection).Find(query),
