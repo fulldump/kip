@@ -3,8 +3,6 @@ package kip
 import (
 	"reflect"
 	"strings"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Item struct { // or interface{} ?????
@@ -63,11 +61,9 @@ func word_in_string(w string, s string) bool {
 	return false
 }
 
-func (i *Item) Delete() error { // Change name to `Remove` ???
+func (i *Item) Delete() error {
 	d := i.Dao
 	collection := d.Collection
 
-	return d.Database.C(collection.Name).Remove(bson.M{
-		"_id": i.GetId(),
-	})
+	return d.Database.C(collection.Name).RemoveId(i.GetId())
 }

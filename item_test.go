@@ -5,7 +5,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func (w *World) Test_ItemDelete(c *C) {
+func (w *World) Test_Item_Delete(c *C) {
 
 	john := w.Users.Create()
 	john.Save()
@@ -21,7 +21,7 @@ func (w *World) Test_ItemDelete(c *C) {
 
 }
 
-func (w *World) Test_ItemSave(c *C) {
+func (w *World) Test_Item_Save(c *C) {
 
 	john := w.Users.Create()
 	john.Save()
@@ -36,7 +36,7 @@ func (w *World) Test_ItemSave(c *C) {
 
 }
 
-func (w *World) Test_ItemSaveTwice(c *C) {
+func (w *World) Test_Item_Save_Twice(c *C) {
 
 	john := w.Users.Create()
 
