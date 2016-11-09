@@ -6,6 +6,10 @@ func init() {
 	global = NewKip()
 }
 
+func Global() *Kip {
+	return global
+}
+
 func Define(c *Collection) {
 	global.Define(c)
 }
