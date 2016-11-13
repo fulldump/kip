@@ -40,8 +40,8 @@ func (q *Query) Count() (n int, err error) {
 	return q.mgo_query.Count()
 }
 
-func (q *Query) Iter() {
-	// TODO!
+func (q *Query) Iter() *mgo.Iter {
+	return q.mgo_query.Iter()
 }
 
 func (q *Query) One() {
