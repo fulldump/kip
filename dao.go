@@ -19,8 +19,10 @@ func (i *Dao) Create() *Item {
 	}
 
 	return &Item{
-		Dao:   i,
-		Value: c(),
+		Dao:     i,
+		Value:   c(),
+		saved:   false,
+		updated: false,
 	}
 }
 
@@ -32,6 +34,10 @@ func (i *Dao) Insert(o *Item) error {
 	// TODO: Update inserted field?
 
 	return err
+}
+
+func (d *Dao) update(id interface{}, update interface{}) error {
+	return d.Database.C(d.Collection.Name).UpdateId(id, update)
 }
 
 /**
@@ -54,6 +60,8 @@ func (i *Dao) FindOne(query bson.M) *Item {
 	err := i.Database.C(collection).Find(query).One(item.Value)
 
 	if nil == err {
+		item.saved = true
+		item.updated = true
 		return item
 	}
 

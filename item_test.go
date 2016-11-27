@@ -43,3 +43,26 @@ func (w *World) Test_Item_Save_Twice(c *C) {
 	c.Assert(john.Save(), IsNil)
 	c.Assert(john.Save(), NotNil)
 }
+
+func (w *World) Test_Item_Update(c *C) {
+
+	john := w.Users.Create()
+	john.Save()
+
+	// Do a patch
+	john.Patch(&Patch{
+		Operation: "set",
+		Key:       "name",
+		Value:     "New name",
+	})
+	john.Save()
+
+	// Check
+	item := &User{}
+	w.Database.C(w.Users.Collection.Name).Find(bson.M{
+		"_id": john.GetId(),
+	}).One(item)
+
+	c.Assert(item.Name, Equals, "New name")
+
+}

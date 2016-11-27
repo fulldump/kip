@@ -1,17 +1,67 @@
 package kip
 
 import (
+	"errors"
 	"reflect"
 	"strings"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 type Item struct { // or interface{} ?????
-	Dao   *Dao
-	Value interface{}
+	Dao     *Dao
+	Value   interface{}
+	saved   bool
+	updated bool
+	updates *bson.M
 }
 
 func (i *Item) Save() error {
-	return i.Dao.Insert(i)
+
+	if !i.saved {
+		insertErr := i.Dao.Insert(i)
+		if nil == insertErr {
+			i.saved = true
+			i.updated = true
+		}
+
+		return insertErr
+	}
+
+	if !i.updated {
+		updateErr := i.Dao.update(i.GetId(), i.updates)
+		if nil == updateErr {
+			i.updated = true
+		}
+
+		return updateErr
+	}
+
+	return errors.New("already saved")
+}
+
+func (i *Item) Patch(p *Patch) error {
+
+	if "set" == p.Operation {
+		if nil == i.updates {
+			i.updates = &bson.M{}
+		}
+
+		u := *i.updates
+
+		if _, exists := u["$set"]; !exists {
+			u["$set"] = bson.M{}
+		}
+
+		// TODO: check value type with type
+		// TODO: check mapping bson/json field name
+
+		u["$set"].(bson.M)[p.Key] = p.Value
+		i.updated = false
+		return nil
+	}
+
+	return errors.New("invalid operation")
 }
 
 func (i *Item) GetId() interface{} {
