@@ -72,10 +72,11 @@ func (i *Dao) FindOne(query bson.M) *Item {
 	panic(err)
 }
 
-func (i *Dao) Find(query bson.M) *Query {
-	collection := i.Collection.Name
+func (d *Dao) Find(query bson.M) *Query {
+	collection := d.Collection.Name
 	return &Query{
-		mgo_query: i.Database.C(collection).Find(query),
+		dao:       d,
+		mgo_query: d.Database.C(collection).Find(query),
 	}
 }
 

@@ -1,8 +1,9 @@
 package kip
 
-import "gopkg.in/mgo.v2"
+import mgo "gopkg.in/mgo.v2"
 
 type Query struct {
+	dao       *Dao
 	mgo_query *mgo.Query
 }
 
@@ -42,6 +43,24 @@ func (q *Query) Count() (n int, err error) {
 
 func (q *Query) Iter() *mgo.Iter {
 	return q.mgo_query.Iter()
+}
+
+func (q *Query) ForEach(f func(*Item)) *Query {
+
+	i := q.mgo_query.Iter()
+
+	item := q.dao.Create()
+	for i.Next(item.Value) {
+		item.saved = true
+
+		f(item)
+
+		item = q.dao.Create()
+	}
+
+	i.Close()
+
+	return q
 }
 
 func (q *Query) One() {
