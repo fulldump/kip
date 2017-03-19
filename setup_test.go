@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	. "gopkg.in/check.v1"
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -41,7 +41,9 @@ func (w *World) SetUpTest(c *C) {
 		Name: "Users",
 		OnCreate: func() interface{} {
 			return &User{
-				Id: bson.NewObjectId(),
+				Id:      bson.NewObjectId(),
+				Friends: []string{},
+				Colors:  []string{},
 			}
 		},
 	})

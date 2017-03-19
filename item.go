@@ -59,6 +59,31 @@ func (i *Item) Patch(p *Patch) error {
 		u["$set"].(bson.M)[p.Key] = p.Value
 		i.updated = false
 		return nil
+	} else if "add_to_set" == p.Operation {
+		if nil == i.updates {
+			i.updates = &bson.M{}
+		}
+
+		u := *i.updates
+
+		if _, exists := u["$addToSet"]; !exists {
+			u["$addToSet"] = bson.M{}
+		}
+
+		c := u["$addToSet"].(bson.M)
+
+		if _, exists := c[p.Key]; !exists {
+			c[p.Key] = bson.M{
+				"$each": []interface{}{},
+			}
+		}
+
+		f := c[p.Key].(bson.M)["$each"].([]interface{})
+
+		c[p.Key].(bson.M)["$each"] = append(f, p.Value)
+
+		i.updated = false
+		return nil
 	}
 
 	return errors.New("invalid operation")
