@@ -10,4 +10,5 @@ type User struct {
 	Single  bool          `bson:"single"`
 	Friends []string      `bson:"friends"`
 	Colors  []string      `bson:"colors"`
+	Lock    bool          `bson:"lock"`
 }

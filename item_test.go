@@ -157,3 +157,67 @@ func (w *World) Test_Item_Update_Multi(c *C) {
 	c.Assert(item.Colors, DeepEquals, []string{"Blue"})
 
 }
+
+func (w *World) Test_Item_Where_LockAcquired(c *C) {
+
+	john_item := w.Users.Create()
+	john := john_item.Value.(*User)
+	john.Name = "John"
+	john.Age = 25
+	john.Lock = false
+	john_item.Save()
+
+	// Try to get lock
+	john_item.Patch(&Patch{
+		Operation: "set",
+		Key:       "lock",
+		Value:     26,
+	})
+	john_item.Where(bson.M{
+		"lock": false,
+	})
+	err := john_item.Save()
+
+	c.Assert(err, IsNil)
+
+	// Check
+	item := &User{}
+	w.Database.C(w.Users.Collection.Name).Find(bson.M{
+		"_id": john.Id,
+	}).One(item)
+
+	c.Assert(item.Lock, DeepEquals, true)
+
+}
+
+func (w *World) Test_Item_Where_LockNotAcquired(c *C) {
+
+	john_item := w.Users.Create()
+	john := john_item.Value.(*User)
+	john.Name = "John"
+	john.Age = 25
+	john.Lock = true
+	john_item.Save()
+
+	// Try to get lock
+	john_item.Patch(&Patch{
+		Operation: "set",
+		Key:       "lock",
+		Value:     26,
+	})
+	john_item.Where(bson.M{
+		"lock": false,
+	})
+	err := john_item.Save()
+
+	c.Assert(err, NotNil)
+
+	// Check
+	item := &User{}
+	w.Database.C(w.Users.Collection.Name).Find(bson.M{
+		"_id": john.Id,
+	}).One(item)
+
+	c.Assert(item.Lock, DeepEquals, true)
+
+}

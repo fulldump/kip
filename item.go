@@ -9,11 +9,12 @@ import (
 )
 
 type Item struct { // or interface{} ?????
-	Dao     *Dao
-	Value   interface{}
-	saved   bool
-	updated bool
-	updates *bson.M
+	Dao       *Dao
+	Value     interface{}
+	saved     bool
+	updated   bool
+	updates   *bson.M
+	condition *bson.M
 }
 
 func (i *Item) Save() error {
@@ -29,7 +30,18 @@ func (i *Item) Save() error {
 	}
 
 	if !i.updated {
-		updateErr := i.Dao.update(i.GetId(), i.updates)
+		selector := bson.M{
+			"_id": i.GetId(),
+		}
+		if nil != i.condition {
+			selector = bson.M{
+				"$and": []bson.M{
+					selector,
+					*(i.condition),
+				},
+			}
+		}
+		updateErr := i.Dao.update(selector, i.updates)
 		if nil == updateErr {
 			i.updated = true
 		}
@@ -141,4 +153,16 @@ func (i *Item) Delete() error {
 	collection := d.Collection
 
 	return d.Database.C(collection.Name).RemoveId(i.GetId())
+}
+
+func (i *Item) Where(condition bson.M) *Item {
+	i.condition = &condition
+
+	return i
+}
+
+func (i *Item) Reload() error {
+	d := i.Dao
+
+	return d.Database.C(d.Collection.Name).FindId(i.GetId()).One(i.Value)
 }
