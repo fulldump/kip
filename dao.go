@@ -36,8 +36,8 @@ func (i *Dao) Insert(o *Item) error {
 	return err
 }
 
-func (d *Dao) update(id interface{}, update interface{}) error {
-	return d.Database.C(d.Collection.Name).UpdateId(id, update)
+func (d *Dao) update(selector interface{}, update interface{}) error {
+	return d.Database.C(d.Collection.Name).Update(selector, update)
 }
 
 /**
