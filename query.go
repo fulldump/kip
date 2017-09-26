@@ -63,7 +63,6 @@ func (q *Query) ForEach(f func(*Item)) *Query {
 	return q
 }
 
-func (q *Query) One() {
-	// TODO!
-	// Already implemented by Instance
+func (q *Query) One(result interface{}) error {
+	return q.mgo_query.One(result)
 }
