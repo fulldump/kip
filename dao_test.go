@@ -2,6 +2,7 @@ package kip
 
 import (
 	. "gopkg.in/check.v1"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -12,18 +13,20 @@ func (w *World) Test_InstanceFindById_Ok(c *C) {
 	w.Users.Insert(john)
 
 	// Run
-	u := w.Users.FindById(john.GetId())
+	u, err := w.Users.FindById(john.GetId())
 
 	// Check
 	c.Assert(u.Value, DeepEquals, john.Value)
+	c.Assert(err, IsNil)
 }
 
 func (w *World) Test_InstanceFindById_NotFound(c *C) {
 
-	u := w.Users.FindById("invented id")
+	u, err := w.Users.FindById("invented id")
 
 	// Check
 	c.Assert(u, IsNil)
+	c.Assert(err, DeepEquals, mgo.ErrNotFound)
 }
 
 func (w *World) Test_InstanceFindOne_Ok(c *C) {
@@ -34,19 +37,21 @@ func (w *World) Test_InstanceFindOne_Ok(c *C) {
 	w.Users.Insert(john)
 
 	// Run
-	u := w.Users.FindOne(bson.M{"name": "John Snow"})
+	u, err := w.Users.FindOne(bson.M{"name": "John Snow"})
 
 	// Check
 	c.Assert(u.Value, DeepEquals, john.Value)
+	c.Assert(err, IsNil)
 }
 
 func (w *World) Test_InstanceFindOne_Fail(c *C) {
 
 	// Run
-	u := w.Users.FindOne(bson.M{"name": "John Snow"})
+	u, err := w.Users.FindOne(bson.M{"name": "John Snow"})
 
 	// Check
 	c.Assert(u, IsNil)
+	c.Assert(err, DeepEquals, mgo.ErrNotFound)
 }
 
 func (w *World) Test_Dao_Delete_Ok(c *C) {

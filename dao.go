@@ -1,6 +1,8 @@
 package kip
 
-import "gopkg.in/mgo.v2/bson"
+import (
+	"gopkg.in/mgo.v2/bson"
+)
 
 // Dao is the combination of `Collection` definition plus a `Database`
 type Dao struct {
@@ -43,7 +45,7 @@ func (d *Dao) update(selector interface{}, update interface{}) error {
 /**
  * FindById is a particular case of FindOne
  */
-func (i *Dao) FindById(id interface{}) *Item {
+func (i *Dao) FindById(id interface{}) (*Item, error) {
 	return i.FindOne(bson.M{"_id": id})
 }
 
@@ -53,23 +55,19 @@ func (i *Dao) FindById(id interface{}) *Item {
  *  - nil     -> Item not found
  *  - panic() -> Some kind of uncontrolled error happened
  */
-func (i *Dao) FindOne(query bson.M) *Item {
+func (i *Dao) FindOne(query bson.M) (*Item, error) {
 	item := i.Create()
 
 	collection := i.Collection.Name
 	err := i.Database.C(collection).Find(query).One(item.Value)
 
-	if nil == err {
-		item.saved = true
-		item.updated = true
-		return item
+	if nil != err {
+		return nil, err
 	}
 
-	if "not found" == err.Error() {
-		return nil
-	}
-
-	panic(err)
+	item.saved = true
+	item.updated = true
+	return item, nil
 }
 
 func (d *Dao) Find(query bson.M) *Query {
