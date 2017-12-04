@@ -1,6 +1,7 @@
 package kip
 
 import (
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -60,6 +61,10 @@ func (i *Dao) FindOne(query bson.M) (*Item, error) {
 
 	collection := i.Collection.Name
 	err := i.Database.C(collection).Find(query).One(item.Value)
+
+	if mgo.ErrNotFound == err {
+		return nil, nil
+	}
 
 	if nil != err {
 		return nil, err
