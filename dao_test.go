@@ -2,7 +2,6 @@ package kip
 
 import (
 	. "gopkg.in/check.v1"
-	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -26,7 +25,7 @@ func (w *World) Test_InstanceFindById_NotFound(c *C) {
 
 	// Check
 	c.Assert(u, IsNil)
-	c.Assert(err, DeepEquals, mgo.ErrNotFound)
+	c.Assert(err, IsNil)
 }
 
 func (w *World) Test_InstanceFindOne_Ok(c *C) {
@@ -51,7 +50,7 @@ func (w *World) Test_InstanceFindOne_Fail(c *C) {
 
 	// Check
 	c.Assert(u, IsNil)
-	c.Assert(err, DeepEquals, mgo.ErrNotFound)
+	c.Assert(err, IsNil)
 }
 
 func (w *World) Test_Dao_Delete_Ok(c *C) {
