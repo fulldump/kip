@@ -52,9 +52,15 @@ func (w *World) SetUpTest(c *C) {
 }
 
 func (w *World) TearDownTest(c *C) {
+
 	// When all tests are finished, drop database
 	session, _ := mgo.Dial(w.MongoHosts)
 	session.SetMode(mgo.Monotonic, true)
 	session.DB(w.Database.name).DropDatabase()
 	session.Close()
+}
+
+func (w *World) TearDownSuite(c *C) {
+	//fmt.Println("SLEEPING...")
+	//time.Sleep(20 * time.Second)
 }

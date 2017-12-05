@@ -87,12 +87,10 @@ func (i *Dao) FindOne(query bson.M) (*Item, error) {
 	return item, nil
 }
 
-// TODO: clone here
-func (d *Dao) Find(query bson.M) *Query {
-	collection := d.Collection.Name
+func (d *Dao) Find(query interface{}) *Query {
 	return &Query{
-		dao:       d,
-		mgo_query: d.Database.C(collection).Find(query),
+		dao:      d,
+		selector: query,
 	}
 }
 
