@@ -2,7 +2,7 @@ package kip
 
 import (
 	. "gopkg.in/check.v1"
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -50,7 +50,7 @@ func (w *World) Test_DaoCallbackOnCreate(c *C) {
 	})
 
 	// Instantiate Dao
-	users := w.Kip.NewDao("Users2", nil)
+	users := w.Kip.NewDao("Users2", w.Database)
 
 	// Creae user
 	john := users.Create()

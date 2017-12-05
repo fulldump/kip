@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"gopkg.in/mgo.v2"
+	mgo "gopkg.in/mgo.v2"
 )
 
 type Database struct {
@@ -75,12 +75,24 @@ func CloseAll() {
 	}
 }
 
-func (this *Database) C(collection string) *mgo.Collection {
-	return this.session.DB(this.name).C(collection)
+func (d *Database) C(collection string) *mgo.Collection {
+	return d.session.DB(d.name).C(collection)
 }
 
-func (this *Database) GetName() string {
-	return this.name
+func (d *Database) GetName() string {
+	return d.name
+}
+
+func (d *Database) Clone() *Database {
+	return &Database{
+		addrs:   d.addrs,
+		name:    d.name,
+		session: d.session.Clone(),
+	}
+}
+
+func (d *Database) Close() {
+	d.session.Close()
 }
 
 func normalize_addrs(addrs []string) string {

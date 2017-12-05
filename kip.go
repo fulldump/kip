@@ -27,7 +27,7 @@ func (k *Kip) Define(c *Collection) {
 	k.collections[name] = c
 }
 
-func (k *Kip) NewDao(name string, db *Database) *Dao {
+func (k *Kip) NewDao(name string, database *Database) *Dao {
 
 	// Check name is defined
 	c, exists := k.collections[name]
@@ -38,13 +38,16 @@ func (k *Kip) NewDao(name string, db *Database) *Dao {
 	// Create Dao
 	i := &Dao{
 		Collection: c,
-		Database:   db,
+		Database:   database,
 	}
+
+	db := database.Clone()
+	defer db.Close()
 
 	// Ensure indexes
 	for _, index := range c.Indexes {
 		if nil != db.C(c.Name).EnsureIndex(index) {
-			panic("Unable to create index for `" + name + "`")
+			panic("Unable to ensure index for `" + name + "`")
 		}
 	}
 
