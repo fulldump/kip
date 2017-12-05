@@ -1,53 +1,74 @@
 package kip
 
-import mgo "gopkg.in/mgo.v2"
+import (
+	mgo "gopkg.in/mgo.v2"
+)
 
 type Query struct {
-	dao       *Dao
-	mgo_query *mgo.Query
+	dao *Dao
+
+	limit    *int
+	selector interface{}
+	skip     *int
+	sort     []string
+	snapshot bool
 }
 
 func (q *Query) Limit(n int) *Query {
-	q.mgo_query = q.mgo_query.Limit(n)
+	q.limit = &n
 	return q
 }
 
 func (q *Query) Select(selector interface{}) *Query {
-	q.mgo_query = q.mgo_query.Select(selector)
+	q.selector = selector
 	return q
 }
 
 func (q *Query) Skip(n int) *Query {
-	q.mgo_query = q.mgo_query.Skip(n)
+	q.skip = &n
 	return q
 }
 
 func (q *Query) Snapshot() *Query {
-	q.mgo_query = q.mgo_query.Snapshot()
+	q.snapshot = true
 	return q
 }
 
 func (q *Query) Sort(fields ...string) *Query {
-	q.mgo_query = q.mgo_query.Sort(fields...)
+	q.sort = fields
 	return q
 }
 
 // Finalizers
 func (q *Query) All(result interface{}) error {
-	return q.mgo_query.All(result)
+
+	query, db := q.buildQuery()
+	defer db.Close()
+
+	return query.All(result)
 }
 
 func (q *Query) Count() (n int, err error) {
-	return q.mgo_query.Count()
+
+	query, db := q.buildQuery()
+	defer db.Close()
+
+	return query.Count()
 }
 
-func (q *Query) Iter() *mgo.Iter {
-	return q.mgo_query.Iter()
+func (q *Query) Iter() (*mgo.Iter, *Database) {
+
+	query, db := q.buildQuery()
+
+	return query.Iter(), db
 }
 
-func (q *Query) ForEach(f func(*Item)) *Query {
+func (q *Query) ForEach(f func(*Item)) error {
 
-	i := q.mgo_query.Iter()
+	query, db := q.buildQuery()
+	defer db.Close()
+
+	i := query.Iter()
 
 	item := q.dao.Create()
 	for i.Next(item.Value) {
@@ -58,11 +79,40 @@ func (q *Query) ForEach(f func(*Item)) *Query {
 		item = q.dao.Create()
 	}
 
-	i.Close()
-
-	return q
+	return i.Close()
 }
 
 func (q *Query) One(result interface{}) error {
-	return q.mgo_query.One(result)
+
+	query, db := q.buildQuery()
+	defer db.Close()
+
+	return query.One(result)
+}
+
+// Internal helper
+func (q *Query) buildQuery() (query *mgo.Query, db *Database) {
+
+	db = q.dao.Database.Clone()
+	// NOTE: do not defer db.Close()
+
+	query = db.C(q.dao.Collection.Name).Find(q.selector)
+
+	if nil != q.limit {
+		query = query.Limit(*q.limit)
+	}
+
+	if nil != q.skip {
+		query = query.Skip(*q.skip)
+	}
+
+	if q.snapshot {
+		query = query.Snapshot()
+	}
+
+	if nil != q.sort {
+		query = query.Sort(q.sort...)
+	}
+
+	return
 }
