@@ -149,10 +149,15 @@ func word_in_string(w string, s string) bool {
 }
 
 func (i *Item) Delete() error {
+
 	d := i.Dao
+
+	db := d.Database.Clone()
+	defer db.Close()
+
 	collection := d.Collection
 
-	return d.Database.C(collection.Name).RemoveId(i.GetId())
+	return db.C(collection.Name).RemoveId(i.GetId())
 }
 
 func (i *Item) Where(condition bson.M) *Item {
@@ -164,5 +169,8 @@ func (i *Item) Where(condition bson.M) *Item {
 func (i *Item) Reload() error {
 	d := i.Dao
 
-	return d.Database.C(d.Collection.Name).FindId(i.GetId()).One(i.Value)
+	db := d.Database.Clone()
+	defer db.Close()
+
+	return db.C(d.Collection.Name).FindId(i.GetId()).One(i.Value)
 }

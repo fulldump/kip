@@ -29,10 +29,14 @@ func (i *Dao) Create() *Item {
 	}
 }
 
-func (i *Dao) Insert(o *Item) error {
+func (d *Dao) Insert(o *Item) error {
+
 	// TODO: Check if already inserted?
 
-	err := i.Database.C(i.Collection.Name).Insert(o.Value)
+	db := d.Database.Clone()
+	defer db.Close()
+
+	err := db.C(d.Collection.Name).Insert(o.Value)
 
 	// TODO: Update inserted field?
 
@@ -40,7 +44,11 @@ func (i *Dao) Insert(o *Item) error {
 }
 
 func (d *Dao) update(selector interface{}, update interface{}) error {
-	return d.Database.C(d.Collection.Name).Update(selector, update)
+
+	db := d.Database.Clone()
+	defer db.Close()
+
+	return db.C(d.Collection.Name).Update(selector, update)
 }
 
 /**
@@ -60,7 +68,11 @@ func (i *Dao) FindOne(query bson.M) (*Item, error) {
 	item := i.Create()
 
 	collection := i.Collection.Name
-	err := i.Database.C(collection).Find(query).One(item.Value)
+
+	db := i.Database.Clone()
+	defer db.Close()
+
+	err := db.C(collection).Find(query).One(item.Value)
 
 	if mgo.ErrNotFound == err {
 		return nil, nil
@@ -75,6 +87,7 @@ func (i *Dao) FindOne(query bson.M) (*Item, error) {
 	return item, nil
 }
 
+// TODO: clone here
 func (d *Dao) Find(query bson.M) *Query {
 	collection := d.Collection.Name
 	return &Query{
@@ -84,12 +97,12 @@ func (d *Dao) Find(query bson.M) *Query {
 }
 
 // Delete will remove all items that match with the query
-func (i *Dao) Delete(query bson.M) (n int, err error) {
+func (d *Dao) Delete(query bson.M) (n int, err error) {
 
-	name := i.Collection.Name
-	c := i.Database.C(name)
+	db := d.Database.Clone()
+	defer db.Close()
 
-	info, err := c.RemoveAll(query)
+	info, err := db.C(d.Collection.Name).RemoveAll(query)
 
 	return info.Removed, err
 }
