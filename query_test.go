@@ -127,3 +127,22 @@ func (w *World) Test_Query_Limit(c *C) {
 	c.Assert(err, IsNil)
 
 }
+
+func (w *World) Test_Query_Projection(c *C) {
+
+	w.Stub_20AgedUsers()
+
+	result := bson.M{}
+
+	err := w.Users.Find(nil).Select(bson.M{"age": 1, "_id": -1}).One(&result)
+
+	expected := bson.M{
+		"_id": result["_id"],
+		"age": result["age"],
+	}
+
+	c.Assert(result, DeepEquals, expected)
+
+	c.Assert(err, IsNil)
+
+}

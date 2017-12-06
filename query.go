@@ -9,6 +9,7 @@ type Query struct {
 
 	limit    *int
 	selector interface{}
+	projection interface{}
 	skip     *int
 	sort     []string
 	snapshot bool
@@ -19,8 +20,8 @@ func (q *Query) Limit(n int) *Query {
 	return q
 }
 
-func (q *Query) Select(selector interface{}) *Query {
-	q.selector = selector
+func (q *Query) Select(projection interface{}) *Query {
+	q.projection = projection
 	return q
 }
 
@@ -112,6 +113,10 @@ func (q *Query) buildQuery() (query *mgo.Query, db *Database) {
 
 	if nil != q.sort {
 		query = query.Sort(q.sort...)
+	}
+
+	if nil != q.projection {
+		query = query.Select(q.projection)
 	}
 
 	return
