@@ -14,15 +14,15 @@ type Dao struct {
 /**
  * Create a new item for the existing collection
  */
-func (i *Dao) Create() *Item {
+func (d *Dao) Create() *Item {
 
-	c := i.Collection.OnCreate
+	c := d.Collection.OnCreate
 	if nil == c {
-		panic("Mandatory callback `OnCreate` is needed for `" + i.Collection.Name + "`")
+		panic("Mandatory callback `OnCreate` is needed for `" + d.Collection.Name + "`")
 	}
 
 	return &Item{
-		Dao:     i,
+		Dao:     d,
 		Value:   c(),
 		saved:   false,
 		updated: false,
@@ -54,8 +54,8 @@ func (d *Dao) update(selector interface{}, update interface{}) error {
 /**
  * FindById is a particular case of FindOne
  */
-func (i *Dao) FindById(id interface{}) (*Item, error) {
-	return i.FindOne(bson.M{"_id": id})
+func (d *Dao) FindById(id interface{}) (*Item, error) {
+	return d.FindOne(bson.M{"_id": id})
 }
 
 /**
@@ -64,12 +64,12 @@ func (i *Dao) FindById(id interface{}) (*Item, error) {
  *  - nil     -> Item not found
  *  - panic() -> Some kind of uncontrolled error happened
  */
-func (i *Dao) FindOne(query bson.M) (*Item, error) {
-	item := i.Create()
+func (d *Dao) FindOne(query interface{}) (*Item, error) {
+	item := d.Create()
 
-	collection := i.Collection.Name
+	collection := d.Collection.Name
 
-	db := i.Database.Clone()
+	db := d.Database.Clone()
 	defer db.Close()
 
 	err := db.C(collection).Find(query).One(item.Value)
